@@ -16,7 +16,6 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
-  console.log(post)
   return(
     <>
       <Head>
@@ -39,6 +38,15 @@ export default function Post({ post }: PostProps) {
 export const getServerSideProps: GetServerSideProps = async ({ req, params }) => {
   const session = await getSession({ req});
   const { slug } = params;
+
+  if (!session?.activeSubscription) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      }
+    }
+  }
 
   const prismic = getPrismicClient(req);
   const response = await prismic.getByUID('post', String(slug), {});
